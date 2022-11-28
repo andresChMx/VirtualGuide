@@ -1,0 +1,128 @@
+import 'package:rxdart/rxdart.dart';
+import 'package:tour_guide/data/providers/userProvider.dart';
+import 'package:tour_guide/ui/bloc/validators.dart';
+
+class SigninBloc extends Validators {
+  final userProvider = UserProvider();
+
+  BehaviorSubject<String> _emailController;
+  BehaviorSubject<String> _passwordController;
+  BehaviorSubject<String> _nameController;
+  BehaviorSubject<String> _lastNameController;
+  BehaviorSubject<String> _dniController;
+  BehaviorSubject<String> _districtController;
+  BehaviorSubject<String> _birthDateController;
+  BehaviorSubject<String> _experienceController;
+  BehaviorSubject<String> _genreController;
+  BehaviorSubject<String> _requestResult;
+  bool flagControllersAreClosed;
+  SigninBloc() {
+    flagControllersAreClosed = false;
+    init();
+  }
+  // Recuperar los datos del Stream
+  Stream<String> get emailStream =>
+      _emailController.stream.transform(validateEmail);
+  Stream<String> get passwordStream =>
+      _passwordController.stream.transform(validatePassword);
+  Stream<String> get nameStream =>
+      _nameController.stream.transform(validateName);
+  Stream<String> get lastNameStream =>
+      _lastNameController.stream.transform(validateLastName);
+
+  Stream<String> get dniStream => _dniController.stream.transform(validateDni);
+  Stream<String> get districtStream => _districtController.stream;
+  Stream<String> get birthDateStream => _birthDateController.stream;
+  Stream<String> get experienceStream => _experienceController.stream;
+  Stream<String> get genreStream => _genreController.stream;
+  Stream<String> get requestResultStream => _requestResult.stream;
+
+  Stream<bool> get formValidStream => Rx.combineLatest9(
+      emailStream,
+      passwordStream,
+      nameStream,
+      lastNameStream,
+      districtStream,
+      birthDateStream,
+      dniStream,
+      experienceStream,
+      genreStream,
+      (a, b, c, d, e, f, g, h, i) => true);
+
+  // Insertar valores al Stream
+  Function(String) get changeEmail => _emailController.sink.add;
+  Function(String) get changePassword => _passwordController.sink.add;
+  Function(String) get changeName => _nameController.sink.add;
+  Function(String) get changeLastName => _lastNameController.sink.add;
+  Function(String) get changeDni => _dniController.sink.add;
+  Function(String) get changeDistrict => _districtController.sink.add;
+  Function(String) get changeBirthDate => _birthDateController.sink.add;
+  Function(String) get changeExperience => _experienceController.sink.add;
+  Function(String) get changeGenre => _genreController.sink.add;
+  Function(String) get changeRequestResult => _requestResult.sink.add;
+
+  // Obtener el último valor ingresado a los streams
+  String get email => _emailController.value;
+  String get password => _passwordController.value;
+  String get name => _nameController.value;
+  String get lastName => _lastNameController.value;
+  String get dni => _dniController.value;
+  String get district => _districtController.value;
+  String get birthDate => _birthDateController.value;
+  String get experience => _experienceController.value;
+  String get genre => _genreController.value;
+  String get requestResult => _requestResult.value;
+
+  dispose() {
+    _emailController.close();
+    _passwordController.close();
+    _nameController.close();
+    _lastNameController.close();
+    _dniController.close();
+    _districtController.close();
+    _birthDateController.close();
+    _experienceController.close();
+    _genreController.close();
+    _requestResult.close();
+    flagControllersAreClosed = true;
+  }
+
+  init() {
+    if (_emailController != null && !_emailController.isClosed) {
+      if (flagControllersAreClosed) {
+        throw new Exception('Race condition at SiginBloc');
+      }
+      return;
+    }
+    flagControllersAreClosed = false;
+
+    _emailController = BehaviorSubject<String>();
+    _passwordController = BehaviorSubject<String>();
+    _nameController = BehaviorSubject<String>();
+    _lastNameController = BehaviorSubject<String>();
+    _dniController = BehaviorSubject<String>();
+    _districtController = BehaviorSubject<String>();
+    _birthDateController = BehaviorSubject<String>();
+    _experienceController = BehaviorSubject<String>();
+    _genreController = BehaviorSubject<String>();
+    _requestResult = BehaviorSubject<String>();
+  }
+
+  Future<String> signin(
+      String name,
+      String lastName,
+      String email,
+      String password,
+      String birthDate,
+      String district,
+      String dni,
+      String genre,
+      String experience) async {
+    try {
+      return await userProvider.signinUser(name, lastName, email, password,
+          birthDate, district, dni, genre, experience);
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+}
