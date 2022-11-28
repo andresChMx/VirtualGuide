@@ -8,8 +8,6 @@ This mobile app is dependent on a RESTful API that can be accessed [here](https:
 
 #### Showcase
 
-![](screenshots\A.png)
+![](andresChMx/VirtualGuide/main/screenshots/A.png)
 
-
-
-![](screenshots\B.png)
+![](andresChMx/VirtualGuide/main/screenshots/B.png)
